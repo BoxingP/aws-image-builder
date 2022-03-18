@@ -1,0 +1,4 @@
+---
+requirements:
+  - docker==5.0.0
+  - six==1.16.0

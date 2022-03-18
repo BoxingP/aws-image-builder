@@ -1,0 +1,41 @@
+---
+- name: upload files to remote
+  ansible.posix.synchronize:
+    src: '{{ playbook_dir }}/docker/'
+    dest: '/tmp/docker/'
+    mode: push
+    delete: yes
+    recursive: yes
+
+- name: generate crontab file
+  lineinfile:
+    path: '/tmp/docker/cron/crontab'
+    line: '{{ lookup("template", "./docker/cron/template.crontab.j2") }}'
+    state: present
+    insertafter: EOF
+    create: yes
+
+- name: make sure the empty last line exists in crontab file
+  lineinfile:
+    path: '/tmp/docker/cron/crontab'
+    regexp: '^#(.*)\Z$'
+    state: absent
+  check_mode: true
+  changed_when: false
+  register: check
+
+- name: insert the empty last line in the crontab file if not exists
+  lineinfile:
+    path: '/tmp/docker/cron/crontab'
+    line: '#'
+    insertafter: EOF
+    state: present
+  when: check.found == 0
+
+- name: create allure report directory
+  file:
+    path: '{{ allure_report_path }}'
+    state: directory
+    recurse: yes
+    mode: '0755'
+  become: yes

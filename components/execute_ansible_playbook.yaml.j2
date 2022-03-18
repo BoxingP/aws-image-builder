@@ -1,0 +1,44 @@
+name: 'Execute Ansible Playbook on Amazon Linux 2'
+description: 'this document installs ansible against amazon linux 2, then downloads and executes an ansible playbook'
+schemaVersion: 1.0
+
+phases:
+    - name: build
+      steps:
+        - name: InstallAnsible
+          action: ExecuteBash
+          inputs:
+            commands:
+              - sudo yum update -y
+              - sudo amazon-linux-extras enable ansible2
+              - sudo yum install -y ansible
+        - name: CreateFolderForPlaybook
+          action: CreateFolder
+          inputs:
+            - path: /tmp/set_up_ec2/
+        - name: DownloadPlaybook
+          action: S3Download
+          inputs:
+            - source: 's3://{{ aws_s3_bucket_name }}/components/set_up_ec2/*'
+              destination: '{% raw %}{{ build.CreateFolderForPlaybook.inputs[0].path }}{% endraw %}'
+              overwrite: true
+        - name: InstallAnsibleRequirements
+          action: ExecuteBinary
+          inputs:
+            path: ansible-galaxy
+            arguments:
+              - 'collection'
+              - 'install'
+              - '-r'
+              - '{% raw %}{{ build.CreateFolderForPlaybook.inputs[0].path }}requirements.yaml{% endraw %}'
+        - name: InvokeAnsible
+          action: ExecuteBinary
+          inputs:
+            path: ansible-playbook
+            arguments:
+              - '{% raw %}{{ build.CreateFolderForPlaybook.inputs[0].path }}playbook.yaml{% endraw %}'
+        - name: DeletePlaybook
+          action: ExecuteBash
+          inputs:
+            commands:
+              - rm -rf '{% raw %}{{ build.CreateFolderForPlaybook.inputs[0].path }}{% endraw %}'

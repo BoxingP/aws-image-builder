@@ -1,0 +1,31 @@
+---
+- name: init figlet for debian
+  import_tasks: debian.yaml
+  when: ansible_facts['os_family']|lower == 'debian'
+
+- name: init figlet for rhel
+  import_tasks: redhat.yaml
+  when: ansible_facts['os_family']|lower == 'redhat'
+
+- name: generate motd text
+  shell: figlet -f {{ motd_figlet_font }} {{ motd_text }} > /tmp/motd
+
+- name: append motd messages
+  blockinfile:
+    path: /tmp/motd
+    insertafter: EOF
+    block: '{{ lookup("template", "motd_message.j2") }}'
+    marker: ''
+    state: present
+  become: yes
+
+- name: update motd banner messages
+  copy:
+    src: /tmp/motd
+    dest: /etc/
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+    remote_src: yes
+  become: yes

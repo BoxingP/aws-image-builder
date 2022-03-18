@@ -1,0 +1,13 @@
+---
+- name: install epel-release for centos
+  yum:
+    name:
+      - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    state: present
+  become: yes
+
+- name: install figlet
+  yum:
+    name: figlet
+    state: present
+  become: yes

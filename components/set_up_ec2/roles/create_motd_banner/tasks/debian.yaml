@@ -1,0 +1,14 @@
+---
+- name: update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 86400
+  become: yes
+  ignore_errors: yes
+
+- name: install figlet
+  apt:
+    name:
+      - figlet
+    state: present
+  become: yes

@@ -1,0 +1,29 @@
+---
+- name: install docker
+  command: amazon-linux-extras install docker -y
+  become: yes
+
+- name: ensure docker is started and enabled at boot
+  service:
+    name: docker
+    state: started
+    enabled: true
+  become: yes
+
+- name: restart docker
+  service:
+    name: docker
+    state: restarted
+  become: yes
+
+- name: ensure docker users are added to the docker group
+  user:
+    name: '{{ item }}'
+    groups: docker
+    append: yes
+    state: present
+  loop: '{{ docker_users }}'
+  become: yes
+
+- name: reset ssh connection
+  meta: reset_connection

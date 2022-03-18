@@ -1,0 +1,6 @@
+aws-cdk.aws_iam==1.128.0
+aws-cdk.aws_imagebuilder==1.128.0
+aws-cdk.aws_s3==1.128.0
+aws-cdk.aws_s3_deployment==1.128.0
+aws-cdk.core==1.128.0
+pyyaml<5.5, >=3.10

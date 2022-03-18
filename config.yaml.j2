@@ -1,0 +1,18 @@
+---
+aws_base_image_arn: 'arn:aws-cn:imagebuilder:cn-northwest-1:aws:image/amazon-linux-2-kernel-5-x86/x.x.x'
+aws_region: 'cn-northwest-1'
+aws_s3_bucket_name: '{{ project | lower | replace(' ', '-') }}-{{ deploy_environment | lower | replace(' ', '-') }}-s3'
+aws_tags:
+  Name:
+  app role:
+  application owner: '{{ owner }}'
+  application: 'monitoring for thermofisher.cn'
+  businessunit:
+  costcenter:
+  data classification: 'internal use'
+  division:
+  environment: '{{ deploy_environment }}'
+  project: '{{ project | lower }}'
+  snow support: 'cn.corp.mst.digital operations'
+environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
+project: '{{ project | lower | replace(' ', '-') }}'
