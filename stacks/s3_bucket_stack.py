@@ -34,7 +34,7 @@ class S3BucketStack(cdk.Stack):
 
         cdk.CfnOutput(
             self, 'OutputS3BucketName',
-            export_name=construct_id.title() + 'BucketName',
+            export_name=construct_id.title().replace('-', '') + 'BucketName',
             value=s3_bucket.bucket_name
         )
 

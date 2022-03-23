@@ -23,6 +23,7 @@ s3_bucket_stack = S3BucketStack(
     app, s3_bucket_name,
     bucket_name=s3_bucket_name,
     components_prefix=components_prefix,
+    versioned=False,
     env=aws_environment
 )
 image_builder_stack = ImageBuilderStack(
