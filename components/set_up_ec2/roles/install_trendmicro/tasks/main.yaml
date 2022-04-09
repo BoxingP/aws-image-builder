@@ -1,0 +1,53 @@
+---
+- name: create trendmicro directory
+  ansible.builtin.file:
+    path: '{{ trendmicro_path }}'
+    state: directory
+    recurse: yes
+    mode: '0755'
+  become: yes
+
+- name: download trendmicro package from remote
+  ansible.builtin.get_url:
+    url: '{{ trendmicro_package_url }}'
+    dest: '{{ trendmicro_path }}/trendmicro_agent.rpm'
+    checksum: 'sha1:{{ trendmicro_package_sha1 }}'
+    timeout: 300
+  become: yes
+
+- name: install trendmicro agent
+  ansible.builtin.shell:
+    cmd: 'rpm -ihv ./trendmicro_agent.rpm'
+    chdir: '{{ trendmicro_path }}'
+  become: yes
+
+- name: pause for 15 seconds to install trendmicro agent
+  pause:
+    prompt: 'Make sure TrendMicro agent installation is complete.'
+    seconds: 15
+
+- name: reset trendmicro agent config
+  ansible.builtin.shell:
+    cmd: '/opt/ds_agent/dsa_control -r'
+  become: yes
+
+- name: set trendmicro agent config
+  ansible.builtin.shell:
+    cmd: '/opt/ds_agent/dsa_control -a "{{ trendmicro_activation_url }}" "tenantID:{{ trendmicro_tenant_id }}" "token:{{ trendmicro_token }}" "policyid:{{ trendmicro_policy_id }}"'
+  become: yes
+
+- name: check trendmicro agent status
+  ansible.builtin.shell: '/opt/ds_agent/dsa_query -c "GetAgentStatus" | grep "AgentStatus.agentState"'
+  register: trendmicro_status_result
+  become: yes
+
+- name: display trendmicro agent status
+  ansible.builtin.debug:
+    msg: 'TrendMicro agent is up and running.'
+  when: trendmicro_status_result.stdout is search('green')
+
+- name: remove trendmicro directory
+  file:
+    path: '{{ trendmicro_path }}'
+    state: absent
+  become: yes

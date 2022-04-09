@@ -1,0 +1,39 @@
+---
+- name: create rapid7 directory
+  ansible.builtin.file:
+    path: '{{ rapid7_path }}'
+    state: directory
+    recurse: yes
+    mode: '0755'
+  become: yes
+
+- name: download install script from remote
+  ansible.builtin.get_url:
+    url: '{{ rapid7_install_script_url }}'
+    dest: '{{ rapid7_path }}/rapid7_agent_installer.sh'
+    mode: '0755'
+    checksum: 'sha1:{{ rapid7_install_script_sha1 }}'
+    timeout: 300
+  become: yes
+
+- name: install rapid7
+  ansible.builtin.shell:
+    cmd: './rapid7_agent_installer.sh install_start --token us:{{ rapid7_token }}'
+    chdir: '{{ rapid7_path }}'
+  become: yes
+
+- name: check rapid7 agent process status
+  ansible.builtin.shell: ss -nltp | grep ir_agent | awk '{print $1}'
+  register: rapid7_status_result
+  become: yes
+
+- name: display rapid7 agent status
+  ansible.builtin.debug:
+    msg: 'Rapid7 agent is up and running.'
+  when: rapid7_status_result.stdout == 'LISTEN'
+
+- name: remove rapid7 directory
+  file:
+    path: '{{ rapid7_path }}'
+    state: absent
+  become: yes

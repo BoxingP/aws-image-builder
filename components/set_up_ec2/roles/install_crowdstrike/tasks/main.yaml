@@ -1,0 +1,54 @@
+---
+- name: create crowdstrike directory
+  ansible.builtin.file:
+    path: '{{ crowdstrike_path }}'
+    state: directory
+    recurse: yes
+    mode: '0755'
+  become: yes
+
+- name: download crowdstrike package from remote
+  ansible.builtin.get_url:
+    url: '{{ crowdstrike_package_url }}'
+    dest: '{{ crowdstrike_path }}/falcon-sensor.amzn2.x86_64.rpm'
+    checksum: 'sha1:{{ crowdstrike_package_sha1 }}'
+    timeout: 300
+  become: yes
+
+- name: install crowdstrike package
+  ansible.builtin.yum:
+    name: '{{ crowdstrike_path }}/falcon-sensor.amzn2.x86_64.rpm'
+    state: present
+  become: yes
+
+- name: set crowdstrike customer id
+  command: '/opt/CrowdStrike/falconctl -s --cid={{ crowdstrike_cid }}'
+  become: yes
+
+- name: start service crowdstrike
+  ansible.builtin.service:
+    name: falcon-sensor
+    state: started
+  become: yes
+
+- name: enable service crowdstrike start on boot
+  ansible.builtin.service:
+    name: falcon-sensor
+    enabled: yes
+  become: yes
+
+- name: check service crowdstrike status
+  ansible.builtin.shell: 'systemctl status falcon-sensor | grep "Active:"'
+  register: crowdstrike_status_result
+  become: yes
+
+- name: display service crowdstrike status
+  ansible.builtin.debug:
+    msg: 'Service CrowdStrike is up and running.'
+  when: crowdstrike_status_result.stdout is search('running')
+
+- name: remove crowdstrike directory
+  file:
+    path: '{{ crowdstrike_path }}'
+    state: absent
+  become: yes
