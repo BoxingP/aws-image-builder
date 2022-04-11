@@ -5,14 +5,15 @@
 
 - name: fetch files from remote
   fetch:
-    src: '{{ play_path }}/{{ item }}'
-    dest: '/tmp/'
+    src: '{{ play_path }}/{{ item.path }}'
+    dest: '/tmp/{{ item.file }}'
     flat: yes
     fail_on_missing: yes
   loop:
-    - 'config.yaml'
-    - 'components/execute_ansible_playbook.yaml.j2'
-    - 'components/set_up_ec2/docker/cron/Dockerfile.j2'
+    - { file: 'config.yaml', path: 'config.yaml' }
+    - { file: 'execute_ansible_playbook.yaml.j2', path: 'components/execute_ansible_playbook.yaml.j2' }
+    - { file: 'cron_Dockerfile.j2', path: 'components/set_up_ec2/docker/cron/Dockerfile.j2' }
+    - { file: 'nginx_Dockerfile.j2', path: 'components/set_up_ec2/docker/nginx/Dockerfile.j2'}
 
 - name: load variables from config file
   include_vars:
@@ -20,9 +21,10 @@
 
 - name: upload to remote
   template:
-    src: '/tmp/{{ item.file }}.j2'
-    dest: '{{ play_path }}/{{ item.path }}/{{ item.file }}'
+    src: '/tmp/{{ item.template }}'
+    dest: '{{ play_path }}/{{ item.path }}'
     force: yes
   loop:
-    - { file: 'execute_ansible_playbook.yaml', path: 'components' }
-    - { file: 'Dockerfile', path: 'components/set_up_ec2/docker/cron' }
+    - { template: 'execute_ansible_playbook.yaml.j2', path: 'components/execute_ansible_playbook.yaml' }
+    - { template: 'cron_Dockerfile.j2', path: 'components/set_up_ec2/docker/cron/Dockerfile' }
+    - { template: 'nginx_Dockerfile.j2', path: 'components/set_up_ec2/docker/nginx/Dockerfile' }

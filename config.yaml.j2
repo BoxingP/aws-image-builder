@@ -16,3 +16,7 @@ aws_tags:
   snow support: 'cn.corp.mst.digital operations'
 environment: '{{ deploy_environment | lower | replace(' ', '-') }}'
 project: '{{ project | lower | replace(' ', '-') }}'
+sigsci_agent:
+  access_key_id: ''
+  secret_access_key: ''
+  server_hostname: '{{ project | replace(" ", "-") }}-allure-report'
