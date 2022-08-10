@@ -1,8 +1,0 @@
----
-trendmicro_path: '/tmp/trendmicro'
-trendmicro_package_url: ''
-trendmicro_package_sha1: '71320f1d9752b486137b01ec9acdf06e4c5f31bb'
-trendmicro_activation_url: ''
-trendmicro_tenant_id: ''
-trendmicro_token: ''
-trendmicro_policy_id: ''

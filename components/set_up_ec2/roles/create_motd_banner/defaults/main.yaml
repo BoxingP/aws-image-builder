@@ -1,3 +1,0 @@
----
-motd_text: '{{ project | title | replace(" ", "") }}'
-motd_figlet_font: 'standard'

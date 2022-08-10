@@ -12,8 +12,6 @@
   loop:
     - { file: 'config.yaml', path: 'config.yaml' }
     - { file: 'execute_ansible_playbook.yaml.j2', path: 'components/execute_ansible_playbook.yaml.j2' }
-    - { file: 'cron_Dockerfile.j2', path: 'components/set_up_ec2/docker/cron/Dockerfile.j2' }
-    - { file: 'nginx_Dockerfile.j2', path: 'components/set_up_ec2/docker/nginx/Dockerfile.j2'}
 
 - name: load variables from config file
   include_vars:
@@ -26,5 +24,3 @@
     force: yes
   loop:
     - { template: 'execute_ansible_playbook.yaml.j2', path: 'components/execute_ansible_playbook.yaml' }
-    - { template: 'cron_Dockerfile.j2', path: 'components/set_up_ec2/docker/cron/Dockerfile' }
-    - { template: 'nginx_Dockerfile.j2', path: 'components/set_up_ec2/docker/nginx/Dockerfile' }
